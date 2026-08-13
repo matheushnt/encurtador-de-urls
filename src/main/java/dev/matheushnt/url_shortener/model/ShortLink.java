@@ -2,6 +2,8 @@ package dev.matheushnt.url_shortener.model;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,6 +33,7 @@ public class ShortLink {
     @Column(name = "original_url", nullable = false)
     private String originalUrl;
 
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -41,6 +44,20 @@ public class ShortLink {
     public String toString() {
         return "ShortLink [id=" + id + ", shortCode=" + shortCode + ", originalUrl=" + originalUrl + ", createdAt="
                 + createdAt + ", expiresAt=" + expiresAt + "]";
+    }
+
+    public static ShortLink create(
+        String shortCode,
+        String originalUrl,
+        LocalDateTime createdAt,
+        LocalDateTime expiresAt
+    ) {
+        var shortLink = new ShortLink();
+        shortLink.setShortCode(shortCode);
+        shortLink.setOriginalUrl(originalUrl);
+        shortLink.setExpiresAt(expiresAt);
+
+        return shortLink;
     }
 
     @Override
