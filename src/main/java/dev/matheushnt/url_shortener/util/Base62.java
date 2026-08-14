@@ -1,4 +1,4 @@
-package dev.matheushnt.url_shortener.service;
+package dev.matheushnt.url_shortener.util;
 
 import org.springframework.stereotype.Component;
 
