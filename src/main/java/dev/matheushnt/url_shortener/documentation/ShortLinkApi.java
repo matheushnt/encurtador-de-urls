@@ -194,4 +194,54 @@ public interface ShortLinkApi {
         @PathVariable String shortCode
     );
 
+    @Operation(summary = "Busca um link curto e o exclui", description = "Busca pelo código um link curto e exclui ele.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Link curto excluído com sucesso"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Link curto não encontrado",
+            content = @Content(
+                mediaType = "application/problem+json",
+                schema = @Schema(implementation = ProblemDetail.class),
+                examples = @ExampleObject(
+                    value = """
+                    {
+                        "type": "https://api.url_shortener.com/problems/short-link-not-found",
+                        "title": "NOT_FOUND",
+                        "status": 404,
+                        "detail": "Link curto não encontrado",
+                        "instance": "/links/aZ91k"
+                    }
+                    """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "410",
+            description = "O link curto encontra-se expirado",
+            content = @Content(
+                mediaType = "application/problem+json",
+                schema = @Schema(implementation = ProblemDetail.class),
+                examples = @ExampleObject(
+                    value = """
+                    {
+                        "type": "https://api.url_shortener.com/problems/short-link-has-expired",
+                        "title": "GONE",
+                        "status": 410,
+                        "detail": "O link curto expirou",
+                        "instance": "/links/trBLg"
+                    }
+                    """
+                )
+            )
+        )
+    })
+    public ResponseEntity<Void> delete(
+        @Parameter(
+            description = "Código do link curto",
+            example = "aZ91k"
+        )
+        @PathVariable String shortCode
+    );
+
 }
