@@ -4,6 +4,7 @@ import java.net.URI;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import dev.matheushnt.url_shortener.exception.ShortLinkExpiredException;
 import dev.matheushnt.url_shortener.model.ShortLink;
 import dev.matheushnt.url_shortener.repository.ShortLinkRepository;
 import dev.matheushnt.url_shortener.service.CreateShortLinkService;
+import dev.matheushnt.url_shortener.util.URL;
 import jakarta.validation.Valid;
 
 @RestController
@@ -32,6 +34,12 @@ public class ShortLinkController implements ShortLinkApi {
 
     @Autowired
     private ShortLinkRepository shortLinkRepository;
+
+    @Autowired
+    private URL urlUtils;
+
+    @Value("${app.baseUrl}")
+    private String baseUrl;
 
     @PostMapping
     @Override
@@ -54,6 +62,23 @@ public class ShortLinkController implements ShortLinkApi {
         return ResponseEntity.status(HttpStatus.FOUND)
             .location(URI.create(shortLink.getOriginalUrl()))
             .build();
+    }
+
+    @GetMapping("/metadata/{shortCode}")
+    @Override
+    public ResponseEntity<ShortLinkResult> getMetadata(@PathVariable String shortCode) {
+        ShortLink shortLink = this.shortLinkRepository.findByShortCode(shortCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Link curto não encontrado"));
+
+        ShortLinkResult shortLinkResult = new ShortLinkResult(
+            shortLink.getShortCode(),
+            this.urlUtils.buildShortUrl(baseUrl, shortCode),
+            shortLink.getOriginalUrl(),
+            shortLink.getCreatedAt(),
+            shortLink.getExpiresAt()
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(shortLinkResult);
     }
 
 }

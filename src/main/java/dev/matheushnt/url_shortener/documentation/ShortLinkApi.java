@@ -145,4 +145,53 @@ public interface ShortLinkApi {
         @PathVariable String shortCode
     );
 
+    @Operation(summary = "Busca os metadados de um link curto", description = "Busca pelo código os metadados de um link curto.")
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "Retorna os metadados de um link curto encontrado",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ShortLinkResult.class),
+                examples = @ExampleObject(
+                    value = """
+                    {
+                        "shortCode": "aZ91k",
+                        "shortUrl": "https://url_shortener.com/aZ91k",
+                        "originalUrl": "https://www.example.com/artigo",
+                        "createdAt": "2026-08-15T19:30:00",
+                        "expiresAt": "2026-08-22T19:30:00"
+                    }
+                    """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Link curto não encontrado",
+            content = @Content(
+                mediaType = "application/problem+json",
+                schema = @Schema(implementation = ProblemDetail.class),
+                examples = @ExampleObject(
+                    value = """
+                    {
+                        "type": "https://api.url_shortener.com/problems/short-link-not-found",
+                        "title": "NOT_FOUND",
+                        "status": 404,
+                        "detail": "Link curto não encontrado",
+                        "instance": "/links/aZ91k"
+                    }
+                    """
+                )
+            )
+        )
+    })
+    public ResponseEntity<ShortLinkResult> getMetadata(
+        @Parameter(
+            description = "Código do link curto",
+            example = "aZ91k"
+        )
+        @PathVariable String shortCode
+    );
+
 }
