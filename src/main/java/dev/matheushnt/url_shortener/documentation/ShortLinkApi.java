@@ -2,11 +2,13 @@ package dev.matheushnt.url_shortener.documentation;
 
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import dev.matheushnt.url_shortener.dto.CreateShortLinkRequest;
 import dev.matheushnt.url_shortener.dto.ShortLinkResult;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -41,7 +43,7 @@ public interface ShortLinkApi {
                             "title": "BAD_REQUEST",
                             "status": 400,
                             "detail": "O corpo da requisição está malformado",
-                            "instance": "/api/short-links"
+                            "instance": "/links"
                         }
                         """
                 )
@@ -62,7 +64,7 @@ public interface ShortLinkApi {
                                 "title": "UNPROCESSABLE_CONTENT",
                                 "status": 422,
                                 "detail": "Um ou mais campos são inválidos",
-                                "instance": "/api/short-links",
+                                "instance": "/links",
                                 "errors": [
                                     {
                                         "field": "originalUrl",
@@ -80,7 +82,7 @@ public interface ShortLinkApi {
                                 "title": "UNPROCESSABLE_CONTENT",
                                 "status": 422,
                                 "detail": "URL informada é inválida",
-                                "instance": "/api/short-links"
+                                "instance": "/links"
                             }
                             """
                     )
@@ -89,5 +91,58 @@ public interface ShortLinkApi {
         )
     })
     ResponseEntity<ShortLinkResult> create(@Valid @RequestBody CreateShortLinkRequest shortLinkRequest);
+
+    @Operation(summary = "Busca um link curto e redireciona para a URL original", description = "Busca os dados de um link curto utilizando seu código e redireciona para a URL original.")
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "302",
+            description = "Código encontrado e redirecionado para a URL original"
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Link curto não encontrado",
+            content = @Content(
+                mediaType = "application/problem+json",
+                schema = @Schema(implementation = ProblemDetail.class),
+                examples = @ExampleObject(
+                    value = """
+                    {
+                        "type": "https://api.url_shortener.com/problems/short-link-not-found",
+                        "title": "NOT_FOUND",
+                        "status": 404,
+                        "detail": "Link curto não encontrado",
+                        "instance": "/links/trBLg"
+                    }
+                    """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "410",
+            description = "O link curto encontra-se expirado",
+            content = @Content(
+                mediaType = "application/problem+json",
+                schema = @Schema(implementation = ProblemDetail.class),
+                examples = @ExampleObject(
+                    value = """
+                    {
+                        "type": "https://api.url_shortener.com/problems/short-link-has-expired",
+                        "title": "GONE",
+                        "status": 410,
+                        "detail": "O link curto expirou",
+                        "instance": "/links/trBLg"
+                    }
+                    """
+                )
+            )
+        )
+    })
+    ResponseEntity<Void> findByShortCode(
+        @Parameter(
+            description = "Código do link curto",
+            example = "trBLg"
+        )
+        @PathVariable String shortCode
+    );
 
 }
