@@ -10,10 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -38,6 +35,9 @@ public class User implements UserDetails {
 
     @Enumerated(value = EnumType.STRING)
     private UserRole role;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<ShortLink> shortLinks = new ArrayList<>();
 
     public static User create(String fullName, String email, String password, UserRole role) {
         User user = new User();
