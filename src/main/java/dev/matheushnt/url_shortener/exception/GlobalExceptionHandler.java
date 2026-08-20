@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -55,11 +57,34 @@ public class GlobalExceptionHandler {
 
         return problemDetail;
     }
+
     @ExceptionHandler(exception = ShortLinkExpiredException.class)
     public ProblemDetail handleShortLinkExpiredException(ShortLinkExpiredException ex, HttpServletRequest request) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.GONE);
         problemDetail.setType(URI.create(BASE_URL + "short-link-has-expired"));
         problemDetail.setTitle(HttpStatus.GONE.name());
+        problemDetail.setDetail(ex.getMessage());
+        problemDetail.setInstance(URI.create(request.getRequestURI()));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(exception = { BadCredentialsException.class, UsernameNotFoundException.class })
+    public ProblemDetail handleAuthenticationFailure(HttpServletRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+        problemDetail.setType(URI.create(BASE_URL + "bad-credentials"));
+        problemDetail.setTitle(HttpStatus.UNAUTHORIZED.name());
+        problemDetail.setDetail("Credenciais inválidas");
+        problemDetail.setInstance(URI.create(request.getRequestURI()));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(exception = ResourceFoundException.class)
+    public ProblemDetail handleResourceFoundException(ResourceFoundException ex, HttpServletRequest request) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        problemDetail.setType(URI.create(BASE_URL + "conflict"));
+        problemDetail.setTitle(HttpStatus.CONFLICT.name());
         problemDetail.setDetail(ex.getMessage());
         problemDetail.setInstance(URI.create(request.getRequestURI()));
 
