@@ -1,5 +1,6 @@
 package dev.matheushnt.url_shortener.controller;
 
+import dev.matheushnt.url_shortener.documentation.AuthControllerApi;
 import dev.matheushnt.url_shortener.dto.AccessToken;
 import dev.matheushnt.url_shortener.dto.SignInRequest;
 import dev.matheushnt.url_shortener.dto.SignUpRequest;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+public class AuthController implements AuthControllerApi {
 
     @Autowired
     private AuthService authService;
@@ -32,12 +33,14 @@ public class AuthController {
     private TokenProvider tokenProvider;
 
     @PostMapping("/sign-up")
+    @Override
     public ResponseEntity<Void> signUp(@Valid @RequestBody SignUpRequest signUpRequest) {
         this.authService.signUp(signUpRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/sign-in")
+    @Override
     public ResponseEntity<AccessToken> signIn(@Valid @RequestBody SignInRequest signInRequest) {
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(signInRequest.email(), signInRequest.password());

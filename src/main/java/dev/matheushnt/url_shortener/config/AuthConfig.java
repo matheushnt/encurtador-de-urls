@@ -32,6 +32,7 @@ public class AuthConfig {
                         .requestMatchers(HttpMethod.GET, "/links/{shortCode}").authenticated()
                         .requestMatchers(HttpMethod.GET, "/links/metadata/{shortCode}").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/links/{shortCode}").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/api-docs/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
