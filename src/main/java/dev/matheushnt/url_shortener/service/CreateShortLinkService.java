@@ -2,6 +2,7 @@ package dev.matheushnt.url_shortener.service;
 
 import java.time.LocalDateTime;
 
+import dev.matheushnt.url_shortener.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class CreateShortLinkService {
     private int durationDaysShortLink;
 
     @Transactional
-    public ShortLinkResult create(String originalUrl) {
+    public ShortLinkResult create(User user, String originalUrl) {
         if (!this.urlUtils.isValidUrl(originalUrl)) {
             throw new InvalidUrlException("URL informada é inválida");
         }
@@ -45,7 +46,7 @@ public class CreateShortLinkService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiresAt = now.plusDays(durationDaysShortLink);
 
-        ShortLink shortLink = this.shortLinkRepository.save(ShortLink.create("short_code_temp", originalUrl, now, expiresAt));
+        ShortLink shortLink = this.shortLinkRepository.save(ShortLink.create("short_code_temp", originalUrl, now, expiresAt, user));
         String shortCode = base62.encode(shortLink.getId());
         shortLink.setShortCode(shortCode);
         this.shortLinkRepository.save(shortLink);

@@ -3,10 +3,13 @@ package dev.matheushnt.url_shortener.controller;
 import java.net.URI;
 import java.time.LocalDateTime;
 
+import dev.matheushnt.url_shortener.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,14 +48,14 @@ public class ShortLinkController implements ShortLinkApi {
     @PostMapping
     @Override
     public ResponseEntity<ShortLinkResult> create(@Valid @RequestBody CreateShortLinkRequest shortLinkRequest) {
-        ShortLinkResult result = this.createShortLinkService.create(shortLinkRequest.originalUrl());
+        ShortLinkResult result = this.createShortLinkService.create(getPrincipal(), shortLinkRequest.originalUrl());
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @GetMapping("/{shortCode}")
     @Override
     public ResponseEntity<Void> findByShortCode(@PathVariable String shortCode) {
-        ShortLink shortLink = this.shortLinkRepository.findByShortCode(shortCode)
+        ShortLink shortLink = this.shortLinkRepository.findByShortCodeAndUserId(shortCode, getPrincipal().getId())
             .orElseThrow(() -> new ResourceNotFoundException("URL original não encontrada"));
 
         boolean hasExpired = LocalDateTime.now().isAfter(shortLink.getExpiresAt());
@@ -68,7 +71,7 @@ public class ShortLinkController implements ShortLinkApi {
     @GetMapping("/metadata/{shortCode}")
     @Override
     public ResponseEntity<ShortLinkResult> getMetadata(@PathVariable String shortCode) {
-        ShortLink shortLink = this.shortLinkRepository.findByShortCode(shortCode)
+        ShortLink shortLink = this.shortLinkRepository.findByShortCodeAndUserId(shortCode, getPrincipal().getId())
             .orElseThrow(() -> new ResourceNotFoundException("Link curto não encontrado"));
 
         ShortLinkResult shortLinkResult = new ShortLinkResult(
@@ -85,7 +88,7 @@ public class ShortLinkController implements ShortLinkApi {
     @DeleteMapping("/{shortCode}")
     @Override
     public ResponseEntity<Void> delete(@PathVariable String shortCode) {
-        ShortLink shortLink = this.shortLinkRepository.findByShortCode(shortCode)
+        ShortLink shortLink = this.shortLinkRepository.findByShortCodeAndUserId(shortCode, getPrincipal().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Link curto não encontrado"));
 
         boolean hasExpired = LocalDateTime.now().isAfter(shortLink.getExpiresAt());
@@ -97,6 +100,10 @@ public class ShortLinkController implements ShortLinkApi {
         this.shortLinkRepository.delete(shortLink);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    private User getPrincipal() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }

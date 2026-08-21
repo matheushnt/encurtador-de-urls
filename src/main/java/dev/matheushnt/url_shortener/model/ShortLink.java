@@ -49,12 +49,15 @@ public class ShortLink {
         String shortCode,
         String originalUrl,
         LocalDateTime createdAt,
-        LocalDateTime expiresAt
+        LocalDateTime expiresAt,
+        User user
     ) {
         var shortLink = new ShortLink();
         shortLink.setShortCode(shortCode);
         shortLink.setOriginalUrl(originalUrl);
+        shortLink.setCreatedAt(createdAt);
         shortLink.setExpiresAt(expiresAt);
+        shortLink.setUser(user);
 
         return shortLink;
     }
