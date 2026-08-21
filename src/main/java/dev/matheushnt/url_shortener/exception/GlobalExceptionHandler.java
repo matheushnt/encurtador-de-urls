@@ -1,8 +1,7 @@
 package dev.matheushnt.url_shortener.exception;
 
-import java.net.URI;
-import java.util.List;
-
+import dev.matheushnt.url_shortener.dto.ErrorDetail;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -12,8 +11,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import dev.matheushnt.url_shortener.dto.ErrorDetail;
-import jakarta.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -23,8 +22,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(exception = MethodArgumentNotValidException.class)
     public ProblemDetail handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request) {
         List<ErrorDetail> errors = ex.getBindingResult().getFieldErrors().stream()
-            .map(error -> new ErrorDetail(error.getField(), error.getDefaultMessage()))
-            .toList();
+                .map(error -> new ErrorDetail(error.getField(), error.getDefaultMessage()))
+                .toList();
 
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_CONTENT);
         problemDetail.setType(URI.create(BASE_URL + "validation-error"));
@@ -69,7 +68,7 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
-    @ExceptionHandler(exception = { BadCredentialsException.class, UsernameNotFoundException.class })
+    @ExceptionHandler(exception = {BadCredentialsException.class, UsernameNotFoundException.class})
     public ProblemDetail handleAuthenticationFailure(HttpServletRequest request) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
         problemDetail.setType(URI.create(BASE_URL + "bad-credentials"));

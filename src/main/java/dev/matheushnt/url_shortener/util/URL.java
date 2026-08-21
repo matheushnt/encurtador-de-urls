@@ -1,10 +1,10 @@
 package dev.matheushnt.url_shortener.util;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @Component
 public final class URL {

@@ -1,19 +1,18 @@
 package dev.matheushnt.url_shortener.service;
 
-import java.time.LocalDateTime;
-
+import dev.matheushnt.url_shortener.dto.ShortLinkResult;
+import dev.matheushnt.url_shortener.exception.InvalidUrlException;
+import dev.matheushnt.url_shortener.model.ShortLink;
 import dev.matheushnt.url_shortener.model.User;
+import dev.matheushnt.url_shortener.repository.ShortLinkRepository;
+import dev.matheushnt.url_shortener.util.Base62;
+import dev.matheushnt.url_shortener.util.URL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import dev.matheushnt.url_shortener.dto.ShortLinkResult;
-import dev.matheushnt.url_shortener.exception.InvalidUrlException;
-import dev.matheushnt.url_shortener.model.ShortLink;
-import dev.matheushnt.url_shortener.repository.ShortLinkRepository;
-import dev.matheushnt.url_shortener.util.Base62;
-import dev.matheushnt.url_shortener.util.URL;
+import java.time.LocalDateTime;
 
 @Service
 public class CreateShortLinkService {

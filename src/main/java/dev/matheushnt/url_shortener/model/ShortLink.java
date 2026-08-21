@@ -1,14 +1,13 @@
 package dev.matheushnt.url_shortener.model;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "short_links")
@@ -46,11 +45,11 @@ public class ShortLink {
     }
 
     public static ShortLink create(
-        String shortCode,
-        String originalUrl,
-        LocalDateTime createdAt,
-        LocalDateTime expiresAt,
-        User user
+            String shortCode,
+            String originalUrl,
+            LocalDateTime createdAt,
+            LocalDateTime expiresAt,
+            User user
     ) {
         var shortLink = new ShortLink();
         shortLink.setShortCode(shortCode);

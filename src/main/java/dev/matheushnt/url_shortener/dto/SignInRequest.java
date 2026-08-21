@@ -12,4 +12,5 @@ public record SignInRequest(
         @NotBlank(message = "O campo [password] é obrigatório")
         @Password
         String password
-) {}
+) {
+}

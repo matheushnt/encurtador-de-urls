@@ -1,7 +1,6 @@
 package dev.matheushnt.url_shortener.documentation;
 
 import dev.matheushnt.url_shortener.dto.AccessToken;
-import dev.matheushnt.url_shortener.dto.ShortLinkResult;
 import dev.matheushnt.url_shortener.dto.SignInRequest;
 import dev.matheushnt.url_shortener.dto.SignUpRequest;
 import io.swagger.v3.oas.annotations.Operation;

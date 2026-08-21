@@ -8,8 +8,8 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("file:${user.dir}/.env")
 public class UrlShortenerApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(UrlShortenerApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(UrlShortenerApplication.class, args);
+    }
 
 }
