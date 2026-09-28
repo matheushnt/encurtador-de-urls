@@ -20,7 +20,6 @@ O redirecionamento utiliza `HTTP 302 Found`, permitindo que o servidor continue 
 
 ## Sumário
 - [Pré-requisitos](#pré-requisitos)
-- [Como gerar o Build](#como-gerar-o-build)
 - [Como executar a aplicação](#como-executar-a-aplicação)
 - [Documentação da API](#documentação-da-api)
 - [Tecnologias utilizadas](#tecnologias-utilizadas)
@@ -28,76 +27,57 @@ O redirecionamento utiliza `HTTP 302 Found`, permitindo que o servidor continue 
 - [Observações](#observações)
 
 ## Pré-requisitos
-Antes de começar, certifique-se de ter instalado:
-- Java 21 ou superior;
-- Maven 3.8+ ou use o Maven Wrapper já incluso no projeto;
+- **Linux:** Docker Engine e Docker Compose v2;
+- **macOS:** Docker Desktop instalado e em execução;
+- **Windows:** Docker Desktop instalado e em execução, WSL 2 instalado e integração do Docker Desktop habilitada para a distribuição Linux;
 - Git (opcional, caso queira clonar o repositório).
 
-## Como gerar o Build
-### Usando o Maven Wrapper
-Como o projeto inclui o Maven Wrapper, você não precisa instalar o Maven globalmente, a menos que você queira.
-#### No Linux/MacOS
-```bash
-./mvnw clean package
-```
-#### No Windows
-```bash
-./mvnw.cmd clean package
-```
-### Usando o Maven instalado globalmente
-Com o Maven instalado, basta executar:
-```bash
-mvn clean package
-```
----
-Estes comandos irão:
-- Limpar a pasta `/target`;
-- Compilar o código-fonte;
-- Gerar o arquivo `.jar`.
-
 ## Como executar a aplicação
-### Usando o Maven (recomendado em desenvolvimento)
-#### No Linux/MacOS
+No Linux, com Docker Engine e Docker Compose instalados, execute os comandos abaixo no terminal, na raiz do projeto.
+
+No macOS, inicie o Docker Desktop e execute os mesmos comandos no Terminal, na raiz do projeto. No Windows, abra o terminal da distribuição WSL integrada ao Docker Desktop e execute os comandos nela, não no PowerShell.
+
+Crie o arquivo `.env`:
 ```bash
-./mvnw spring-boot:run
+cp .env.example .env
 ```
-#### No Windows
+
+Abra `.env` e defina `POSTGRES_PASSWORD` e `JWT_SECRET`. O Docker Compose carrega esse arquivo automaticamente.
+
+Na raiz do projeto, construa a imagem e inicie a aplicação e o banco de dados:
 ```bash
-./mvnw.cmd spring-boot:run
+docker compose up --build -d
 ```
-#### Usando o Maven instalado globalmente
+
+Acompanhe os logs da aplicação:
 ```bash
-mvn spring-boot:run
+docker compose logs -f application
 ```
-### Usando o arquivo `.jar` gerado
-Após realizar o build da aplicação, você pode executar o arquivo `.jar` diretamente:
+
+Quando os logs indicarem que a aplicação iniciou, pressione `Ctrl+C` para encerrar o acompanhamento. Os containers continuarão em execução.
+
+Acesse o Swagger UI em `http://localhost:8080/swagger-ui/index.html` para consultar e testar os endpoints da API. Para parar os serviços sem remover os dados do banco:
 ```bash
-java -jar target/url_shortener-1.0.0.jar
+docker compose down
 ```
----
-A aplicação estará disponível em `http://localhost:8080`.
+
+Os dados do PostgreSQL são mantidos no volume Docker `postgres-data`.
 
 ## Documentação da API
-A API é documentada utilizando **OpenAPI/Swagger**. Após iniciar a aplicação, a documentação interativa pode ser acessada em: `http://localhost:8080/swagger-ui/index.html`. A especificação **OpenAPI** também pode ser consultada em: `http://localhost:8080/api-docs`.
+Com a aplicação em execução, acesse o Swagger UI em `http://localhost:8080/swagger-ui/index.html`. Ele lista as rotas, parâmetros, dados esperados, respostas e requisitos de autenticação. Também permite enviar requisições pela própria interface para testar a API.
 
-O Swagger UI contém a documentação detalhada dos endpoints, incluindo:
-- Parâmetros;
-- Headers;
-- Modelos de requisição;
-- Modelos de resposta;
-- Códigos HTTP;
-- Requisitos de autenticação;
-- Possibilidade de executar as requisições diretamente pela interface.
+A especificação OpenAPI em JSON está disponível em `http://localhost:8080/api-docs`.
 
 ## Tecnologias utilizadas
 - **Java 21** - Linguagem de programação;
 - **Spring Boot 4.0.7** - Framework principal;
 - **Spring Data JPA** - Persistência e acesso aos dados;
 - **Spring Validation** - Validação das requisições;
-- **Spring Security** - Autenticação e autorização
-- **H2 Database** - Banco de dados em memória;
+- **Spring Security** - Autenticação e autorização;
+- **PostgreSQL 17** - Banco de dados relacional;
 - **Flyway** - Gerenciamento de migrations e versionamento do banco de dados;
 - **Maven** - Gerenciador de dependências;
+- **Docker e Docker Compose** - Build e execução da aplicação e do banco;
 - **Lombok** - Biblioteca para redução de código boilerplate;
 - **OpenAPI/Swagger** - Documentação da API.
 
@@ -111,8 +91,7 @@ Porém, uma consequência dessa abordagem é que os códigos são previsíveis, 
 Optei por utilizar o status `302 Found` em vez de `301 Moved Permanently`. A escolha evita que o navegador mantenha o redirecionamento em cache e continue acessando a URL original mesmo depois de o link ter expirado ou sido removido
 
 ## Observações
-- A aplicação armazena os registros em memória, ou seja, não persiste em disco;
-- Ao reiniciar a aplicação, todos os registros adicionados serão perdidos;
+- Os dados do PostgreSQL são persistidos no volume Docker `postgres-data`;
 - A documentação detalhada dos endpoints está disponível no **Swagger**;
 - A expiração dos links ocorre após **7 dias**;
 - O código curto é gerado automaticamente e não permite alias personalizado;
